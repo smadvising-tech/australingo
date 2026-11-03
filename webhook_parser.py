@@ -3,7 +3,7 @@ from collections import deque
 _seen = set()
 _order = deque()
 
-def ingest_text(payload, save):
+def ingest_text(payload, save, deduplicate=None, release=None):
     """Process text messages; deduplicate within this Python process only."""
     if payload.get("object") != "whatsapp_business_account":
         return 0
@@ -27,9 +27,19 @@ def ingest_text(payload, save):
                         and phone.isascii() and phone.isdigit()
                         and isinstance(body, str) and body.strip()):
                     continue
-                if mid in _seen:
+                if deduplicate is not None:
+                    if not deduplicate(mid):
+                        continue
+                elif mid in _seen:
                     continue
-                save(phone, body.strip()[:4096], direction="received")
+
+                try:
+                    save(phone, body.strip()[:4096], direction="received")
+                except Exception:
+                    if deduplicate is not None and release is not None:
+                        release(mid)
+                    raise
+
                 _seen.add(mid)
                 _order.append(mid)
                 if len(_order) > 1024:

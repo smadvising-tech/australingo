@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import HTMLResponse, PlainTextResponse
 import json
 import os
 from config import WHATSAPP_WEBHOOK_VERIFY_TOKEN
 from whatsapp import WhatsAppClient
+from teacher_access import require_teacher
+# AUSTRALIGO_TEACHER_AUTH_V1
 
 # Check if we're in demo mode (Cloudflare Worker environment)
 DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() == "true"
@@ -17,7 +19,7 @@ app = FastAPI(title="WhatsApp Business Cloud API")
 # Explicit opt-in: never expose writable demo APIs by default.
 if DEMO_MODE and os.environ.get("ENABLE_DEMO_API") == "1":
     from demo_inbox import router as demo_inbox_router
-    app.include_router(demo_inbox_router)
+    app.include_router(demo_inbox_router, dependencies=[Depends(require_teacher)])
 
 
 # Initialize database or demo storage
@@ -124,13 +126,20 @@ async def handle_webhook(request: Request):
             log_message(phone, text, direction=direction)
             append_message(student_id, "incoming", text)
 
-        ingest_text(body, save_demo_message)
+        # AUSTRALIGO_PERSISTENT_DEDUP_V1
+        from demo_dedup import claim_message, release_message
+        ingest_text(
+            body,
+            save_demo_message,
+            deduplicate=claim_message,
+            release=release_message
+        )
     else:
         ingest_text(body, log_message)
 
     return {"status": "ok"}
 
-@app.get("/dashboard", response_class=HTMLResponse)
+@app.get("/dashboard", response_class=HTMLResponse, dependencies=[Depends(require_teacher)])
 async def dashboard():
     # Until access control exists, never serve actual student data publicly.
     if not DEMO_MODE:
