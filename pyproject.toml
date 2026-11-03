@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "australingo"
+version = "0.1.0"
+description = "WhatsApp Business Cloud API dashboard for Australigo"
+readme = "README.md"
+authors = [{name = "Australigo Team"}]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "fastapi==0.104.1",
+    "python-dotenv==1.0.0",
+    "requests==2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "uvicorn[standard]==0.24.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
+[dependency-groups]
+dev = [
+    "workers-py>=1.17.9",
+    "workers-runtime-sdk>=1.9.5",
+]
+
+[project.scripts]
+australingo = "main:app"

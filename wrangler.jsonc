@@ -1,0 +1,11 @@
+{
+  "name": "australingo",
+  "compatibility_date": "2026-11-03",
+  "compatibility_flags": [
+    "python_workers"
+  ],
+  "main": "worker.py",
+  "vars": {
+    "DEMO_MODE": "true"
+  }
+}
