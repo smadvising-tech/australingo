@@ -32,13 +32,17 @@ dependencies = [
     { name = "fastapi" },
     { name = "python-dotenv" },
     { name = "requests" },
-    { name = "workers-py" },
-    { name = "workers-runtime-sdk" },
 ]
 
 [package.optional-dependencies]
 dev = [
     { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "workers-py" },
+    { name = "workers-runtime-sdk" },
 ]
 
 [package.metadata]
@@ -47,10 +51,14 @@ requires-dist = [
     { name = "python-dotenv", specifier = "==1.0.0" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "uvicorn", extras = ["standard"], marker = "extra == 'dev'", specifier = "==0.24.0" },
-    { name = "workers-py" },
-    { name = "workers-runtime-sdk", specifier = "==0.1.0" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "workers-py", specifier = ">=1.17.9" },
+    { name = "workers-runtime-sdk", specifier = ">=1.9.5" },
+]
 
 [[package]]
 name = "certifi"
@@ -358,11 +366,11 @@ wheels = [
 
 [[package]]
 name = "pyodide-py"
-version = "0.29.5"
+version = "314.0.7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/1d/85/d89ea2de12b8da5e82d5d8c2c8a03f2aebd0830416d22d654b5cfe05c6d9/pyodide_py-0.29.5.tar.gz", hash = "sha256:a38d410aec95e2e2b3d59bdd93176b207db32952953bc3e9df81406a5ee3facd", size = 58799, upload-time = "2026-09-15T22:04:04.018Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/98/df30f080ce2ec52bbb02c3db039edd60fe85d977f6afbf90e09abeb34804/pyodide_py-314.0.7.tar.gz", hash = "sha256:a33774c96f9c51c138e3ef2295ae7b524064d9501e896ceb1a0aa6d4da55f9e5", size = 62895, upload-time = "2026-09-14T05:07:35.015Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/b3/137eb4fcd365e1442e38e3470572cac2ec9eeadbf7a4c9c25bd791f6c757/pyodide_py-0.29.5-py3-none-any.whl", hash = "sha256:9d6d62c5167df01b1d8a94c762197f1fd89a5771fd78bbd07393c812d979352b", size = 66017, upload-time = "2026-09-15T22:04:02.68Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/ec/f2848eda90e7b8571376a846bed27bff3f0d5b10bfd87792f1ac6e7d794d/pyodide_py-314.0.7-py3-none-any.whl", hash = "sha256:75377c696639863ea966330f2eff4a3b6bd1c58a95fbd339859e6949c4be35e3", size = 70473, upload-time = "2026-09-14T05:07:33.664Z" },
 ]
 
 [[package]]
@@ -630,9 +638,9 @@ wheels = [
 
 [[package]]
 name = "workers-runtime-sdk"
-version = "0.1.0"
+version = "1.9.5"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7d/90/4954e37776f0e1064002d3d338bfc33900257da6607c3799987c9cdb6776/workers_runtime_sdk-0.1.0.tar.gz", hash = "sha256:137b974130576a8631f0af8f2e6a824006f2dc845de501a7ecd2d787ed2012a6", size = 25174, upload-time = "2025-10-13T17:04:58.393Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/4e/7f9437226c96dee20a0e80053e7e0fbc39fb6ae2f5a43374e317e0a37945/workers_runtime_sdk-1.9.5.tar.gz", hash = "sha256:605c87a36a38557bf4ccf657de22fe4ee85fb96b1b04c1aacaa476b461ef71bc", size = 146741, upload-time = "2026-10-20T07:54:23.577Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/68/338ff8e8cdb232be9870cf5d761e464bb3637f0e63103533c83fe5a7030a/workers_runtime_sdk-0.1.0-py3-none-any.whl", hash = "sha256:d9503025d0cee84f04a85537330a4a6dfa68a7856233c4afbcfb64d0c9d089ae", size = 14481, upload-time = "2025-10-13T17:04:57.225Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/33/1154f8d518becf3ca3dea57627dea7a84888937cf7b313e6dc4e6f7c7fdf/workers_runtime_sdk-1.9.5-py3-none-any.whl", hash = "sha256:f2b912660a3ab60d2a24920106422f9eaf4cd7a794e42b022237ad2444287fef", size = 41297, upload-time = "2026-10-20T07:54:21.826Z" },
 ]
