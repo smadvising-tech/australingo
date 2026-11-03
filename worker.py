@@ -1,18 +1,37 @@
+
 import os
 
 from workers import asgi, env
 
-# Read Cloudflare Worker binding.
-# Default to demo mode for safety.
-demo_setting = getattr(env, "DEMO_MODE", "true")
+
+def binding_value(name, default):
+    try:
+        if isinstance(env, dict):
+            value = env.get(name, default)
+        else:
+            value = getattr(env, name, default)
+    except Exception:
+        value = default
+
+    return str(value if value is not None else default)
+
+
+def truthy(value):
+    return str(value).lower() in ("1", "true", "yes", "on")
+
 
 os.environ["DEMO_MODE"] = (
     "true"
-    if str(demo_setting).lower() in ("true", "1", "yes", "on")
+    if truthy(binding_value("DEMO_MODE", "true"))
     else "false"
 )
 
-# Import FastAPI only after configuring demo mode.
+for flag in ("ENABLE_DEMO_API", "ENABLE_D1_INBOX"):
+    os.environ[flag] = (
+        "1" if truthy(binding_value(flag, "0")) else "0"
+    )
+
+# Import only after configuring the environment.
 from main import app
 
 Default = asgi.entrypoint(app)

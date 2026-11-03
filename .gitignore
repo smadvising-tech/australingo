@@ -15,3 +15,5 @@ __pycache__/
 *.log
 node_modules/
 *.backup
+
+.dev.vars

@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "australingo-mvp-dev",
+  "main": "worker.py",
+  "compatibility_date": "2026-11-03",
+  "compatibility_flags": [
+    "python_workers"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "DEMO_MODE": "true",
+    "ENABLE_D1_INBOX": "1",
+    "ENABLE_DEMO_API": "0"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "australingo-mvp-dev",
+      "database_id": "21f3f9f9-4501-4060-b5c9-06ddb38b3d90",
+      "migrations_dir": "migrations",
+      "remote": true
+    }
+  ]
+}

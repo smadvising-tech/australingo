@@ -9,17 +9,31 @@ from teacher_access import require_teacher
 
 # Check if we're in demo mode (Cloudflare Worker environment)
 DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() == "true"
+ENABLE_D1_INBOX = os.environ.get("ENABLE_D1_INBOX") == "1"
+ENABLE_DEMO_API = os.environ.get("ENABLE_DEMO_API") == "1"
 
 # In-memory storage for demo mode - this will be replaced with Cloudflare KV in production
 demo_messages_storage = []
 
 app = FastAPI(title="WhatsApp Business Cloud API")
 
-# AUSTRALIGO_DEMO_INBOX_API_V1
-# Explicit opt-in: never expose writable demo APIs by default.
-if DEMO_MODE and os.environ.get("ENABLE_DEMO_API") == "1":
+# AUSTRALIGO_D1_INBOX_ROUTER_V1
+# D1 takes priority over the legacy SQLite demo API.
+if ENABLE_D1_INBOX and not DEMO_MODE:
+    raise RuntimeError("D1 inbox is restricted to the development demo environment")
+
+if DEMO_MODE and ENABLE_D1_INBOX:
+    from d1_inbox import router as d1_inbox_router
+    app.include_router(
+        d1_inbox_router,
+        dependencies=[Depends(require_teacher)]
+    )
+elif DEMO_MODE and ENABLE_DEMO_API:
     from demo_inbox import router as demo_inbox_router
-    app.include_router(demo_inbox_router, dependencies=[Depends(require_teacher)])
+    app.include_router(
+        demo_inbox_router,
+        dependencies=[Depends(require_teacher)]
+    )
 
 
 # Initialize database or demo storage
@@ -109,13 +123,19 @@ async def handle_webhook(request: Request):
             status_code=400, detail="Invalid payload"
         )
 
-    # AUSTRALIGO_PARSER_V1
-    from webhook_parser import ingest_text
-    # AUSTRALIGO_DEMO_WEBHOOK_BRIDGE_V1
-    if DEMO_MODE and os.environ.get("ENABLE_DEMO_API") == "1":
+    # AUSTRALIGO_D1_WEBHOOK_V1
+    if DEMO_MODE and ENABLE_D1_INBOX:
+        from d1_inbox import _get_db, ingest_whatsapp_payload
+
+        await ingest_whatsapp_payload(
+            _get_db(request),
+            body
+        )
+
+    elif DEMO_MODE and ENABLE_DEMO_API:
+        from webhook_parser import ingest_text
         from demo_inbox import append_message
 
-        # Fictional phone numbers only.
         demo_numbers = {"10000000000": "maya"}
 
         def save_demo_message(phone, text, direction="received"):
@@ -126,15 +146,17 @@ async def handle_webhook(request: Request):
             log_message(phone, text, direction=direction)
             append_message(student_id, "incoming", text)
 
-        # AUSTRALIGO_PERSISTENT_DEDUP_V1
         from demo_dedup import claim_message, release_message
+
         ingest_text(
             body,
             save_demo_message,
             deduplicate=claim_message,
             release=release_message
         )
+
     else:
+        from webhook_parser import ingest_text
         ingest_text(body, log_message)
 
     return {"status": "ok"}
@@ -145,7 +167,7 @@ async def dashboard():
     if not DEMO_MODE:
         raise HTTPException(status_code=503, detail="Dashboard login not configured")
     from dashboard_ui import DASHBOARD_HTML
-    if os.environ.get("ENABLE_DEMO_API") == "1":
+    if ENABLE_D1_INBOX or ENABLE_DEMO_API:
         from dashboard_bridge import connect_demo_dashboard
         dashboard_html = connect_demo_dashboard(DASHBOARD_HTML)
     else:
