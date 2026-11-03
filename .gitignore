@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.dev.vars*
+*.db
+*.sqlite
+*.sqlite3
+.venv/
+.venv-workers/
+.wrangler/
+python_modules/
+__pycache__/
+*.pyc
+*.egg-info/
+*.log
+node_modules/
+*.backup
